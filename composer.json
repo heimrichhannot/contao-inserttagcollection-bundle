@@ -2,6 +2,7 @@
     "name": "heimrichhannot/contao-inserttagcollection-bundle",
     "description": "A collection of additional inserttags for contao cms.",
     "type": "contao-bundle",
+    "homepage":"https://github.com/heimrichhannot/contao-inserttagcollection-bundle",
     "authors":[
         {
             "name":"Heimrich & Hannot",

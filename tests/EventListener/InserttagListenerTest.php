@@ -1,16 +1,12 @@
 <?php
-/**
- * Contao Open Source CMS
- *
+
+/*
  * Copyright (c) 2018 Heimrich & Hannot GmbH
  *
- * @author  Thomas Körner <t.koerner@heimrich-hannot.de>
- * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
+ * @license LGPL-3.0-or-later
  */
 
-
 namespace HeimrichHannot\ContaoInserttagCollectionBundle\Test\EventListener;
-
 
 use Contao\ContentDownload;
 use Contao\ContentModel;
@@ -28,14 +24,14 @@ class InserttagListenerTest extends ContaoTestCase
 
         $urlUtil = $this->createMock(UrlUtil::class);
         $urlUtil->method('getJumpToPageObject')->willReturnCallback(function ($pageId) {
-            switch ($pageId)
-            {
+            switch ($pageId) {
                 case 0:
                     return null;
                 case 1:
                     $page = new \stdClass();
                     $page->id = 1;
                     $page->alias = 'index';
+
                     return $page;
             }
         });
@@ -43,16 +39,13 @@ class InserttagListenerTest extends ContaoTestCase
 
         $routerMock = $this->createMock(UrlGenerator::class);
         $routerMock->method('generate')->willReturnCallback(function ($alias, $parameter, $referenceType) {
-            if ('index' === $alias)
-            {
+            if ('index' === $alias) {
                 return 'https://example.org/de/';
             }
-            else {
-                return 'https://example.org/de/'.$alias.'/';
-            }
+
+            return 'https://example.org/de/'.$alias.'/';
         });
         $container->set('contao.routing.url_generator', $routerMock);
-
 
         $listener = new InserttagListener($container, $this->mockContaoFramework());
         $this->assertEmpty($listener->linkAbsoluteUrl([]));
@@ -76,8 +69,8 @@ class InserttagListenerTest extends ContaoTestCase
         $this->assertEmpty($listener->emailLabel(['link_url_abs', 'hallo@Welt']));
         $this->assertEmpty($listener->emailLabel(['link_url_abs', '<script>console.log(\'hacked\');</script>']));
 
-        $this->assertSame('<a href="mailto:info@example.org">info@example.org</a>',$listener->emailLabel(['link_url_abs', 'info@example.org']));
-        $this->assertSame('<a href="mailto:info@example.org">E-Mail</a>',$listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail']));
+        $this->assertSame('<a href="mailto:info@example.org">info@example.org</a>', $listener->emailLabel(['link_url_abs', 'info@example.org']));
+        $this->assertSame('<a href="mailto:info@example.org">E-Mail</a>', $listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail']));
         $this->assertSame(
             '<a href="mailto:info@example.org" class="btn btn-default">E-Mail</a>',
             $listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail', 'btn btn-default'])
@@ -102,9 +95,8 @@ class InserttagListenerTest extends ContaoTestCase
         $contentDownloadMock = $this->createMock(ContentDownload::class);
         $contentDownloadMock->method('generate')->willReturnSelf();
         $framework = $this->mockContaoFramework();
-        $framework->method('createInstance')->willReturnCallback(function($className) use ($contentDownloadMock) {
-            switch ($className)
-            {
+        $framework->method('createInstance')->willReturnCallback(function ($className) use ($contentDownloadMock) {
+            switch ($className) {
                 case ContentDownload::class:
                     return $contentDownloadMock;
                 case ContentModel::class:
