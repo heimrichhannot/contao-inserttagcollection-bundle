@@ -37,7 +37,8 @@
     },
     "replace": {
         "heimrichhannot/contao-inserttags_absolute": "*",
-        "heimrichhannot/contao-inserttag_email": "*"
+        "heimrichhannot/contao-inserttag_email": "*",
+        "heimrichhannot/contao-inserttag_download": "*"
     },
     "extra": {
         "contao-manager-plugin": "HeimrichHannot\\ContaoInserttagCollectionBundle\\ContaoManager\\Plugin"
