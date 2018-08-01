@@ -1,0 +1,6 @@
+services:
+  _defaults:
+    autowire: true
+
+  huh.inserttagscollection.inserttag.absoluteurl:
+    class: HeimrichHannot\ContaoInserttagCollectionBundle\Inserttag\AbsoluteUrlInserttag

@@ -1,0 +1,22 @@
+{
+    "name": "heimrichhannot/contao-inserttagcollection-bundle",
+    "description": "A collection of additional inserttags for contao cms.",
+    "type": "contao-bundle",
+    "authors":[
+        {
+            "name":"Heimrich & Hannot",
+            "email":"digitales@heimrich-hannot.de",
+            "homepage":"https://www.heimrich-hannot.de",
+            "role":"Developer"
+        }
+    ],
+    "license": "LGPL-3.0-or-later",
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.1",
+        "contao/core-bundle": "^4.4"
+    },
+    "replace": {
+        "heimrichhannot/contao-inserttags_absolute": "*"
+    }
+}
