@@ -14,11 +14,12 @@ namespace HeimrichHannot\ContaoInserttagCollectionBundle\EventListener;
 
 use Contao\ContentDownload;
 use Contao\ContentModel;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Routing\UrlGenerator;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\Validator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class InserttagListener
 {
@@ -26,14 +27,20 @@ class InserttagListener
      * @var ContainerInterface
      */
     private $container;
+    /**
+     * @var ContaoFrameworkInterface
+     */
+    private $framework;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, ContaoFrameworkInterface $framework)
     {
         $this->container = $container;
+        $this->framework = $framework;
     }
 
     public function replaceInserttags(string $tag)
     {
+        $tag = trim($tag, '{}');
         $tag = explode('::', $tag);
         if (empty($tag) || count($tag) < 2)
         {
@@ -70,21 +77,25 @@ class InserttagListener
         return '';
     }
 
+    /**
+     * @param array $tag
+     * @return string Mailto-Link or empty string, if no valid mail adress given.
+     */
     public function emailLabel(array $tag)
     {
-        $email = StringUtil::encodeEmail($tag[1]);
-
-        if (empty($email))
+        if (!isset($tag[1]) || !Validator::isEmail($tag[1]))
         {
-            return false;
+            return '';
         }
-
+        $emailLabel = $tag[1];
+        $email   = $this->framework->getAdapter(StringUtil::class)->encodeEmail('mailto:' . $tag[1]);
         // label parameters
-        $label   = (isset($tag[2]) && !empty($tag[2])) ? $tag[2] : preg_replace('/\?.*$/', '', $email);
-        $classes = (isset($tag[3]) && !empty($tag[3])) ? $tag[3] . ' ' : '';
-        $id      = (isset($tag[4]) && !empty($tag[4])) ? $tag[4] : '';
+        $label   = (isset($tag[2]) && !empty($tag[2])) ? $tag[2] : preg_replace('/\?.*$/', '', $emailLabel);
+        $classes = (isset($tag[3]) && !empty($tag[3])) ? ' class="' . $tag[3] . '"' : '';
+        $id      = (isset($tag[4]) && !empty($tag[4])) ? 'id="' . $tag[4] . '" ' : '';
 
-        $link = sprintf('<a id="%s" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;%s" class="%s">%s</a>', $id, $email, $classes, $label);
+
+        $link = sprintf('<a %shref="%s"%s>%s</a>', $id, $email, $classes, $label);
 
         return $link;
     }
@@ -96,37 +107,43 @@ class InserttagListener
         $file = null;
         if (Validator::isUuid($source))
         {
-            $file = FilesModel::findByUuid($source);
-        }
-        elseif (($pos = strpos($source, '/')) !== false) {
+            /** @var FilesModel $file */
+            $file = $this->framework->getAdapter(FilesModel::class)->findByUuid($source);
+        } elseif (($pos = strpos($source, '/')) !== false)
+        {
             if (0 === $pos)
             {
                 $source = ltrim($source, "/");
             }
-                $file = FilesModel::findByPath($source);
+            /** @var FilesModel $file */
+            $file = $this->framework->getAdapter(FilesModel::class)->findByPath($source);
         }
-        if ($file || $file->uuid)
+        if ($file && $file->uuid)
         {
             $source = StringUtil::binToUuid($file->uuid);
         }
 
-        $downloadDate = new ContentModel();
-        $downloadDate->customTpl = 'ce_download_inserttag';
-        $downloadDate->singleSRC = $source;
-        $downloadDate->linkTitle = strip_tags($tag[2]); // remove <span> etc
-        $downloadDate->cssID[1] = 'inserttag_download ' . strip_tags($tag[3]);
-        $downloadDate->cssID[0] = strip_tags($tag[4]);
-
-        return new ContentDownload($downloadDate);
+        $downloadData            = $this->framework->createInstance(ContentModel::class);
+        $downloadData->customTpl = 'ce_download_inserttag';
+        $downloadData->singleSRC = $source;
+        if (isset($tag[2]) && is_string($tag[2]))
+        {
+            $downloadData->linkTitle = $tag[2];
+        }
+        if (isset($tag[3]) && is_string($tag[3]))
+        {
+            $downloadData->cssID[1]  = 'inserttag_download ' . strip_tags($tag[3]);
+        }
+        if (isset($tag[4]) && is_string($tag[4]))
+        {
+            $downloadData->cssID[0]  = strip_tags($tag[4]);
+        }
+        return $this->framework->createInstance(ContentDownload::class, [$downloadData]);
     }
 
     public function download(array $tag)
     {
         $download = $this->generateDownload($tag);
-        if (isset($tag[3]) && !empty($tag[3]))
-        {
-            $download->linkTitle = $tag[3];
-        }
         return $download->generate();
     }
 
