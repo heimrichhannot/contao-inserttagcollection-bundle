@@ -1,3 +1,3 @@
 <?php
 
-$GLOBALS['TL_HOOKS']['replaceInsertTags']['replaceInsertTagsAbsolute'] = ['huh.inserttagscollection.inserttag.absoluteurl','replaceInsertTagsAbsolute'];
+$GLOBALS['TL_HOOKS']['replaceInsertTags']['huhInserttagCollection'] = ['huh.inserttagscollection.listener.inserttags','replaceInserttags'];

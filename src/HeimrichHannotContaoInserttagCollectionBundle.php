@@ -12,8 +12,13 @@
 namespace HeimrichHannot\ContaoInserttagCollectionBundle;
 
 
+use HeimrichHannot\ContaoInserttagCollectionBundle\DependencyInjection\InserttagCollectionExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class HeimrichHannotContaoInserttagCollectionBundle extends Bundle
 {
+    public function getContainerExtension()
+    {
+        return new InserttagCollectionExtension();
+    }
 }
