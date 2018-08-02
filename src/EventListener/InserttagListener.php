@@ -142,12 +142,15 @@ class InserttagListener
         if (isset($tag[2]) && is_string($tag[2])) {
             $downloadData->linkTitle = $tag[2];
         }
+        $cssClass = 'inserttag_download';
+        $cssId = '';
         if (isset($tag[3]) && is_string($tag[3])) {
-            $downloadData->cssID[1] = 'inserttag_download '.strip_tags($tag[3]);
+            $cssClass .= ' '.strip_tags($tag[3]);
         }
         if (isset($tag[4]) && is_string($tag[4])) {
-            $downloadData->cssID[0] = strip_tags($tag[4]);
+            $cssId = strip_tags($tag[4]);
         }
+        $downloadData->cssID = [$cssId, $cssClass];
 
         return $this->framework->createInstance(ContentDownload::class, [$downloadData]);
     }
