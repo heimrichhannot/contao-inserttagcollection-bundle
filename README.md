@@ -23,3 +23,17 @@ download_size | `{{download_size::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Get 
 ```
 composer require heimrichhannot/contao-inserttagcollection-bundle
 ```
+
+### Upgrade from module
+
+This bundle replaces following modules: 
+* `heimrichhannot/contao-inserttags_absolute`
+* `heimrichhannot/contao-inserttag_email`
+* `heimrichhannot/contao-inserttag_download`
+
+See [upgrade notices](docs/upgrade.md) for more information.
+
+
+
+
+

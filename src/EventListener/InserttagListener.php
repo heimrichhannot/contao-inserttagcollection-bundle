@@ -136,6 +136,7 @@ class InserttagListener
         }
 
         $downloadData = $this->framework->createInstance(ContentModel::class);
+        $downloadData->type = 'download';
         $downloadData->customTpl = 'ce_download_inserttag';
         $downloadData->singleSRC = $source;
         if (isset($tag[2]) && is_string($tag[2])) {
