@@ -1,3 +1,3 @@
 <?php
 
-$GLOBALS['TL_HOOKS']['replaceInsertTags']['huhInserttagCollection'] = ['huh.inserttagscollection.listener.inserttags','replaceInserttags'];
+$GLOBALS['TL_HOOKS']['replaceInsertTags']['huhInserttagCollection'] = [\HeimrichHannot\ContaoInserttagCollectionBundle\EventListener\InserttagListener::class, 'onReplaceInsertTags'];

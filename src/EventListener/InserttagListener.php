@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * Copyright (c) 2019 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -34,11 +34,11 @@ class InserttagListener
         $this->framework = $framework;
     }
 
-    public function replaceInserttags(string $tag)
+    public function onReplaceInsertTags(string $tag)
     {
         $tag = trim($tag, '{}');
         $tag = explode('::', $tag);
-        if (empty($tag) || count($tag) < 2) {
+        if (empty($tag)) {
             return false;
         }
         switch ($tag[0]) {
@@ -52,6 +52,10 @@ class InserttagListener
                 return $this->downloadLink($tag);
             case 'download_size':
                 return $this->downloadSize($tag);
+            case 'small':
+                return $this->smallStartTag($tag);
+            case 'endsmall':
+                return $this->smallEndTag($tag);
         }
 
         return false;
@@ -116,6 +120,16 @@ class InserttagListener
         return $download->Template->filesize;
     }
 
+    public function smallStartTag($tag)
+    {
+        return '<small>';
+    }
+
+    public function smallEndTag($tag)
+    {
+        return '</small>';
+    }
+
     private function generateDownload(array $tag)
     {
         $source = strip_tags(($tag[1])); // remove <span> etc, otherwise Validator::isuuid fail
@@ -139,15 +153,15 @@ class InserttagListener
         $downloadData->type = 'download';
         $downloadData->customTpl = 'ce_download_inserttag';
         $downloadData->singleSRC = $source;
-        if (isset($tag[2]) && is_string($tag[2])) {
+        if (isset($tag[2]) && \is_string($tag[2])) {
             $downloadData->linkTitle = $tag[2];
         }
         $cssClass = 'inserttag_download';
         $cssId = '';
-        if (isset($tag[3]) && is_string($tag[3])) {
+        if (isset($tag[3]) && \is_string($tag[3])) {
             $cssClass .= ' '.strip_tags($tag[3]);
         }
-        if (isset($tag[4]) && is_string($tag[4])) {
+        if (isset($tag[4]) && \is_string($tag[4])) {
             $cssId = strip_tags($tag[4]);
         }
         $downloadData->cssID = [$cssId, $cssClass];

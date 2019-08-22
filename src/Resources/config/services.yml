@@ -2,5 +2,5 @@ services:
   _defaults:
     autowire: true
 
-  huh.inserttagscollection.listener.inserttags:
-    class: HeimrichHannot\ContaoInserttagCollectionBundle\EventListener\InserttagListener
+  HeimrichHannot\ContaoInserttagCollectionBundle\EventListener\InserttagListener: ~
+  huh.inserttagscollection.listener.inserttags: '@HeimrichHannot\ContaoInserttagCollectionBundle\EventListener\InserttagListener'

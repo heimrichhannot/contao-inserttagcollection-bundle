@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * Copyright (c) 2019 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -18,6 +18,16 @@ use HeimrichHannot\UtilsBundle\Url\UrlUtil;
 
 class InserttagListenerTest extends ContaoTestCase
 {
+    public function testReplaceInserttags()
+    {
+        $container = $this->mockContainer();
+        $framework = $this->mockContaoFramework();
+        $listener = new InserttagListener($container, $framework);
+
+        $this->assertSame('<small>', $listener->onReplaceInsertTags('{{small}}'));
+        $this->assertSame('</small>', $listener->onReplaceInsertTags('{{endsmall}}'));
+    }
+
     public function testAbsoluteUrl()
     {
         $container = $this->mockContainer();
@@ -105,5 +115,21 @@ class InserttagListenerTest extends ContaoTestCase
         });
         $listener = new InserttagListener($container, $framework);
 //        $this->assertSame('test', $listener->replaceInserttags('{{download::test}}')->);
+    }
+
+    public function testSmallStartTag()
+    {
+        $container = $this->mockContainer();
+        $framework = $this->mockContaoFramework();
+        $listener = new InserttagListener($container, $framework);
+        $this->assertSame('<small>', $listener->smallStartTag(['small']));
+    }
+
+    public function testSmallEndTag()
+    {
+        $container = $this->mockContainer();
+        $framework = $this->mockContaoFramework();
+        $listener = new InserttagListener($container, $framework);
+        $this->assertSame('</small>', $listener->smallEndTag(['endsmall']));
     }
 }
