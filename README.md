@@ -15,8 +15,8 @@ email_label   | `{{email_label::info@example.org::E-Mail}}` | Generate an e-mail
 download      | `{{download::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Generate an download link to the file with file name as label and download size. File parameter can be file uuid or file path. Optional parameter for custom label, link css class and link css id.
 download_link | `{{download_link::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Get the download url. File parameter can be file uuid or file path.
 download_size | `{{download_size::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Get the  formatted download size. File parameter can be file uuid or file path.
-small         | `{{small}}` | Start small text (Outputs `<small>`
-endsmall      | `{{endsmall}}` | Stops small text (Outputs `</small>`
+small         | `{{small}}` | Start small text (Outputs `<small>`)
+endsmall      | `{{endsmall}}` | Stops small text (Outputs `</small>`)
 
 ## Technical introduction
 
