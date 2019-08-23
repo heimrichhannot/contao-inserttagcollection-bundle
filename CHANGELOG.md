@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2019-08-23
+
+- added amp support for download inserttag
+
 ## [0.2.0] - 2019-08-22
 
 - added small and endsmall insert tags

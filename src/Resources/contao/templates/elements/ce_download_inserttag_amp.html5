@@ -1,0 +1,5 @@
+<span class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+    <a href="<?php echo $this->href; ?>" title="<?php echo $this->title; ?>">
+        <?php echo $this->link; ?> <span class="size">(<?php echo $this->filesize; ?>)</span>
+    </a>
+</span>

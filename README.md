@@ -6,6 +6,8 @@
 
 This bundle provides some additional inserttags for contao CMS.
 
+The download inserttag template is already prepared for [AMP Bundle](https://github.com/heimrichhannot/contao-amp-bundle).
+
 ## Inserttags
 
 Inserttag      | Example              | Description
@@ -34,7 +36,6 @@ This bundle replaces following modules:
 * `heimrichhannot/contao-inserttag_download`
 
 See [upgrade notices](docs/upgrade.md) for more information.
-
 
 
 
