@@ -38,30 +38,35 @@ class InserttagListener
     {
         $tag = trim($tag, '{}');
         $tag = explode('::', $tag);
+
         if (empty($tag)) {
             return false;
         }
+
         switch ($tag[0]) {
             case 'link_url_abs':
-                return $this->linkAbsoluteUrl($tag);
+                return $this->generateLinkAbsoluteUrl($tag);
             case 'email_label':
-                return $this->emailLabel($tag);
+                return $this->generateEmailLabel($tag);
             case 'download':
-                return $this->download($tag);
+                return $this->generateDownload($tag);
             case 'download_link':
-                return $this->downloadLink($tag);
+                return $this->generateDownloadLink($tag);
             case 'download_size':
-                return $this->downloadSize($tag);
+                return $this->generateDownloadSize($tag);
             case 'small':
-                return $this->smallStartTag($tag);
+                return $this->generateSmallStartTag($tag);
             case 'endsmall':
-                return $this->smallEndTag($tag);
+                return $this->generateSmallEndTag($tag);
+            case 'strtotime':
+                return $this->generateStrToTime($tag);
+                break;
         }
 
         return false;
     }
 
-    public function linkAbsoluteUrl(array $tag)
+    public function generateLinkAbsoluteUrl(array $tag)
     {
         if (isset($tag[1])) {
             $pageModel = $this->container->get('huh.utils.url')->getJumpToPageObject($tag[1]);
@@ -80,7 +85,7 @@ class InserttagListener
      *
      * @return string mailto-Link or empty string, if no valid mail adress given
      */
-    public function emailLabel(array $tag)
+    public function generateEmailLabel(array $tag)
     {
         if (!isset($tag[1]) || !Validator::isEmail($tag[1])) {
             return '';
@@ -97,42 +102,47 @@ class InserttagListener
         return $link;
     }
 
-    public function download(array $tag)
+    public function generateDownload(array $tag)
     {
-        $download = $this->generateDownload($tag);
+        $download = $this->doGenerateDownload($tag);
 
         return $download->generate();
     }
 
-    public function downloadLink(array $tag)
+    public function generateDownloadLink(array $tag)
     {
-        $download = $this->generateDownload($tag);
+        $download = $this->doGenerateDownload($tag);
         $download->generate();
 
         return $download->Template->href;
     }
 
-    public function downloadSize(array $tag)
+    public function generateDownloadSize(array $tag)
     {
-        $download = $this->generateDownload($tag);
+        $download = $this->doGenerateDownload($tag);
         $download->generate();
 
         return $download->Template->filesize;
     }
 
-    public function smallStartTag($tag)
+    public function generateSmallStartTag($tag)
     {
         return '<small>';
     }
 
-    public function smallEndTag($tag)
+    public function generateSmallEndTag($tag)
     {
         return '</small>';
     }
 
-    private function generateDownload(array $tag)
+    public function generateStrToTime($tag)
     {
-        $source = strip_tags(($tag[1])); // remove <span> etc, otherwise Validator::isuuid fail
+        return strtotime($tag[1], $tag[2] ?? time());
+    }
+
+    private function doGenerateDownload(array $tag)
+    {
+        $source = strip_tags($tag[1]); // remove <span> etc, otherwise Validator::isuuid fail
 
         $file = null;
         if (Validator::isUuid($source)) {
