@@ -11,7 +11,7 @@ namespace HeimrichHannot\ContaoInserttagCollectionBundle\Test\Generator;
 use Contao\TestCase\ContaoTestCase;
 use HeimrichHannot\ContaoInserttagCollectionBundle\Generator\HtmlElementGenerator;
 
-class HtmlElementGeneratorText extends ContaoTestCase
+class HtmlElementGeneratorTest extends ContaoTestCase
 {
     public function testGenerateStartTag()
     {
