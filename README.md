@@ -10,6 +10,8 @@ The download inserttag template is already prepared for [AMP Bundle](https://git
 
 ## Inserttags
 
+### Functionality
+
 Inserttag      | Example              | Description
 --------------|----------------------|-------------
 strtotime     | `{{strtotime::midnight}}` | Returns supported return values of strtotime() (see [php docs](https://www.php.net/manual/de/datetime.formats.relative.php)). Also possible: `{{strtotime::+ 1 day::\<timestamp\>}}`
@@ -18,8 +20,16 @@ email_label   | `{{email_label::info@example.org::E-Mail}}` | Generate an e-mail
 download      | `{{download::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Generate an download link to the file with file name as label and download size. File parameter can be file uuid or file path. Optional parameter for custom label, link css class and link css id.
 download_link | `{{download_link::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Get the download url. File parameter can be file uuid or file path.
 download_size | `{{download_size::9263228b-9577-11e8-abd4-a08cfddc0261}}` | Get the  formatted download size. File parameter can be file uuid or file path.
+
+
+### Html-tags
+
+Inserttag      | Example              | Description
+--------------|----------------------|-------------
 small         | `{{small}}` | Start small text (Outputs `<small>`)
 endsmall      | `{{endsmall}}` | Stops small text (Outputs `</small>`)
+span         | `{{span::class=product highlight&id=product5&title=Super Product}}` | Start span element text (Example outputs `<span class="product highlight" id="product5" title="Super Product">`)
+endspan      | `{{endspan}}` | Stops small text (Outputs `</span>`)
 
 ## Technical introduction
 

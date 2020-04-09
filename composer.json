@@ -14,6 +14,7 @@
     "license": "LGPL-3.0-or-later",
     "require": {
         "php": "^7.1",
+        "ext-dom": "*",
         "contao/core-bundle": "^4.4",
         "heimrichhannot/contao-utils-bundle": "^2.25"
     },

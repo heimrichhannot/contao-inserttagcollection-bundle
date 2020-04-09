@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2020-04-09
+- added span inserttag
+- added html entity generator to make future html-inserttags easier to create
+
 ## [1.0.1] - 2019-11-25
 - fixed hook service not public
 

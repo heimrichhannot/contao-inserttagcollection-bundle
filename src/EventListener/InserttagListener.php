@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2019 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -15,6 +15,7 @@ use Contao\CoreBundle\Routing\UrlGenerator;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\Validator;
+use HeimrichHannot\ContaoInserttagCollectionBundle\Generator\HtmlElementGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InserttagListener
@@ -34,6 +35,11 @@ class InserttagListener
         $this->framework = $framework;
     }
 
+    /**
+     * @param string $tag
+     *
+     * @return bool|string
+     */
     public function onReplaceInsertTags(string $tag)
     {
         $tag = trim($tag, '{}');
@@ -60,10 +66,23 @@ class InserttagListener
                 return $this->generateSmallEndTag($tag);
             case 'strtotime':
                 return $this->generateStrToTime($tag);
-                break;
+            case 'span':
+                return $this->generateHtmlTag('span', $tag);
+            case 'endspan':
+                return $this->generateHtmlEndTag('span', $tag);
         }
 
         return false;
+    }
+
+    public function generateHtmlTag($htmlTag, $insertTag)
+    {
+        return HtmlElementGenerator::generateStartTag($htmlTag, isset($insertTag[1]) ? $insertTag[1] : null);
+    }
+
+    public function generateHtmlEndTag($htmlTag, $insertTag)
+    {
+        return HtmlElementGenerator::generateEndTag($htmlTag);
     }
 
     public function generateLinkAbsoluteUrl(array $tag)
