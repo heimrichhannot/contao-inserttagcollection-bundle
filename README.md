@@ -1,7 +1,7 @@
 # Contao Inserttags Collection Bundle
 [![Latest Stable Version](https://poser.pugx.org/heimrichhannot/contao-inserttagcollection-bundle/v/stable)](https://packagist.org/packages/heimrichhannot/contao-inserttagcollection-bundle)
 [![Total Downloads](https://poser.pugx.org/heimrichhannot/contao-inserttagcollection-bundle/downloads)](https://packagist.org/packages/heimrichhannot/contao-inserttagcollection-bundle)
-[![Build Status](https://travis-ci.org/heimrichhannot/contao-inserttagcollection-bundle.svg?branch=master)](https://travis-ci.org/heimrichhannot/contao-inserttagcollection-bundle)
+![CI](https://github.com/heimrichhannot/contao-inserttagcollection-bundle/workflows/CI/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/heimrichhannot/contao-inserttagcollection-bundle/badge.svg?branch=master)](https://coveralls.io/github/heimrichhannot/contao-inserttagcollection-bundle?branch=master)
 
 This bundle provides some additional inserttags for contao CMS.
