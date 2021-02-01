@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2021 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -58,11 +58,11 @@ class InserttagListenerTest extends ContaoTestCase
         $container->set('contao.routing.url_generator', $routerMock);
 
         $listener = new InserttagListener($container, $this->mockContaoFramework());
-        $this->assertEmpty($listener->linkAbsoluteUrl([]));
-        $this->assertEmpty($listener->linkAbsoluteUrl(['link_url_abs']));
+        $this->assertEmpty($listener->generateLinkAbsoluteUrl([]));
+        $this->assertEmpty($listener->generateLinkAbsoluteUrl(['link_url_abs']));
 
-        $this->assertEmpty($listener->linkAbsoluteUrl(['link_url_abs', 0]));
-        $this->assertSame('https://example.org/de/', $listener->linkAbsoluteUrl(['link_url_abs', 1]));
+        $this->assertEmpty($listener->generateLinkAbsoluteUrl(['link_url_abs', 0]));
+        $this->assertSame('https://example.org/de/', $listener->generateLinkAbsoluteUrl(['link_url_abs', 1]));
     }
 
     public function testEmailLabel()
@@ -74,28 +74,28 @@ class InserttagListenerTest extends ContaoTestCase
             StringUtil::class => $stringUtilMock,
         ]);
         $listener = new InserttagListener($container, $framework);
-        $this->assertEmpty($listener->emailLabel(['link_url_abs']));
-        $this->assertEmpty($listener->emailLabel(['link_url_abs', 'halloWelt']));
-        $this->assertEmpty($listener->emailLabel(['link_url_abs', 'hallo@Welt']));
-        $this->assertEmpty($listener->emailLabel(['link_url_abs', '<script>console.log(\'hacked\');</script>']));
+        $this->assertEmpty($listener->generateEmailLabel(['link_url_abs']));
+        $this->assertEmpty($listener->generateEmailLabel(['link_url_abs', 'halloWelt']));
+        $this->assertEmpty($listener->generateEmailLabel(['link_url_abs', 'hallo@Welt']));
+        $this->assertEmpty($listener->generateEmailLabel(['link_url_abs', '<script>console.log(\'hacked\');</script>']));
 
-        $this->assertSame('<a href="mailto:info@example.org">info@example.org</a>', $listener->emailLabel(['link_url_abs', 'info@example.org']));
-        $this->assertSame('<a href="mailto:info@example.org">E-Mail</a>', $listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail']));
+        $this->assertSame('<a href="mailto:info@example.org">info@example.org</a>', $listener->generateEmailLabel(['link_url_abs', 'info@example.org']));
+        $this->assertSame('<a href="mailto:info@example.org">E-Mail</a>', $listener->generateEmailLabel(['link_url_abs', 'info@example.org', 'E-Mail']));
         $this->assertSame(
             '<a href="mailto:info@example.org" class="btn btn-default">E-Mail</a>',
-            $listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail', 'btn btn-default'])
+            $listener->generateEmailLabel(['link_url_abs', 'info@example.org', 'E-Mail', 'btn btn-default'])
         );
         $this->assertSame(
             '<a id="link" href="mailto:info@example.org" class="btn btn-default">E-Mail</a>',
-            $listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail', 'btn btn-default', 'link'])
+            $listener->generateEmailLabel(['link_url_abs', 'info@example.org', 'E-Mail', 'btn btn-default', 'link'])
         );
         $this->assertSame(
             '<a id="link" href="mailto:info@example.org">E-Mail</a>',
-            $listener->emailLabel(['link_url_abs', 'info@example.org', 'E-Mail', '', 'link'])
+            $listener->generateEmailLabel(['link_url_abs', 'info@example.org', 'E-Mail', '', 'link'])
         );
         $this->assertSame(
             '<a id="link" href="mailto:info@example.org">info@example.org</a>',
-            $listener->emailLabel(['link_url_abs', 'info@example.org', '', '', 'link'])
+            $listener->generateEmailLabel(['link_url_abs', 'info@example.org', '', '', 'link'])
         );
     }
 
@@ -122,7 +122,7 @@ class InserttagListenerTest extends ContaoTestCase
         $container = $this->mockContainer();
         $framework = $this->mockContaoFramework();
         $listener = new InserttagListener($container, $framework);
-        $this->assertSame('<small>', $listener->smallStartTag(['small']));
+        $this->assertSame('<small>', $listener->generateSmallStartTag(['small']));
     }
 
     public function testSmallEndTag()
@@ -130,6 +130,6 @@ class InserttagListenerTest extends ContaoTestCase
         $container = $this->mockContainer();
         $framework = $this->mockContaoFramework();
         $listener = new InserttagListener($container, $framework);
-        $this->assertSame('</small>', $listener->smallEndTag(['endsmall']));
+        $this->assertSame('</small>', $listener->generateSmallEndTag(['endsmall']));
     }
 }
