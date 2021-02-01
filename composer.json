@@ -30,13 +30,7 @@
     "autoload": {
         "psr-4": {
             "HeimrichHannot\\ContaoInserttagCollectionBundle\\": "src/"
-        },
-        "exclude-from-classmap": [
-            "src/Resources/contao/config/",
-            "src/Resources/contao/dca/",
-            "src/Resources/contao/languages/",
-            "src/Resources/contao/templates/"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

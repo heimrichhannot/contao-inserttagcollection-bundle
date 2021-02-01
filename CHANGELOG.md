@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2021-02-01
+- added correct license text
+- fixed NotFoundHttpException exception with multiple download inserttags in contao 4.9 (#1)
+- removed unnecessary lines from composer.json
+
 ## [1.1.0] - 2020-04-09
 - added span inserttag
 - added html entity generator to make future html-inserttags easier to create

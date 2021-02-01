@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2021 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -12,6 +12,7 @@ use Contao\ContentDownload;
 use Contao\ContentModel;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\CoreBundle\Routing\UrlGenerator;
+use Contao\Database;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\Validator;
@@ -20,6 +21,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InserttagListener
 {
+    /**
+     * @var array
+     */
+    protected $contentElementUniqueIdCache = [];
     /**
      * @var ContainerInterface
      */
@@ -36,8 +41,6 @@ class InserttagListener
     }
 
     /**
-     * @param string $tag
-     *
      * @return bool|string
      */
     public function onReplaceInsertTags(string $tag)
@@ -100,8 +103,6 @@ class InserttagListener
     }
 
     /**
-     * @param array $tag
-     *
      * @return string mailto-Link or empty string, if no valid mail adress given
      */
     public function generateEmailLabel(array $tag)
@@ -178,7 +179,17 @@ class InserttagListener
             $source = StringUtil::binToUuid($file->uuid);
         }
 
+        $db = Database::getInstance();
+        $id = $db->getNextId('tl_content');
+        ++$id;
+
+        while (!$db->isUniqueValue('tl_content', 'id', $id) || \in_array($id, $this->contentElementUniqueIdCache)) {
+            ++$id;
+        }
+        $this->contentElementUniqueIdCache[] = $id;
+
         $downloadData = $this->framework->createInstance(ContentModel::class);
+        $downloadData->id = $id;
         $downloadData->type = 'download';
         $downloadData->customTpl = 'ce_download_inserttag';
         $downloadData->singleSRC = $source;
