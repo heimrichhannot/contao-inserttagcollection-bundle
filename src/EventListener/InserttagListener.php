@@ -157,7 +157,13 @@ class InserttagListener
 
     public function generateStrToTime($tag)
     {
-        return strtotime($tag[1], $tag[2] ?? time());
+        $result = strtotime($tag[1], $tag[2] ?? time());
+
+        if (isset($tag[3])) {
+            $result = date($tag[3], $result);
+        }
+
+        return $result;
     }
 
     private function doGenerateDownload(array $tag)

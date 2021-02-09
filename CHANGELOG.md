@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2021-02-01
+
+- added a third option to {{strtotime}} inserttag: date/time format
+
 ## [1.1.1] - 2021-02-01
 - added correct license text
 - fixed NotFoundHttpException exception with multiple download inserttags in contao 4.9 (#1)
