@@ -55,22 +55,31 @@ class InserttagListener
         switch ($tag[0]) {
             case 'link_url_abs':
                 return $this->generateLinkAbsoluteUrl($tag);
+
             case 'email_label':
                 return $this->generateEmailLabel($tag);
+
             case 'download':
                 return $this->generateDownload($tag);
+
             case 'download_link':
                 return $this->generateDownloadLink($tag);
+
             case 'download_size':
                 return $this->generateDownloadSize($tag);
+
             case 'small':
                 return $this->generateSmallStartTag($tag);
+
             case 'endsmall':
                 return $this->generateSmallEndTag($tag);
+
             case 'strtotime':
                 return $this->generateStrToTime($tag);
+
             case 'span':
                 return $this->generateHtmlTag('span', $tag);
+
             case 'endspan':
                 return $this->generateHtmlEndTag('span', $tag);
         }
@@ -92,6 +101,7 @@ class InserttagListener
     {
         if (isset($tag[1])) {
             $pageModel = $this->container->get('huh.utils.url')->getJumpToPageObject($tag[1]);
+
             if ($pageModel) {
                 $url = $this->container->get('contao.routing.url_generator')->generate($pageModel->alias, [], UrlGenerator::ABSOLUTE_URL);
 
@@ -171,6 +181,7 @@ class InserttagListener
         $source = strip_tags($tag[1]); // remove <span> etc, otherwise Validator::isuuid fail
 
         $file = null;
+
         if (Validator::isUuid($source)) {
             /** @var FilesModel $file */
             $file = $this->framework->getAdapter(FilesModel::class)->findByUuid($source);
@@ -181,6 +192,7 @@ class InserttagListener
             /** @var FilesModel $file */
             $file = $this->framework->getAdapter(FilesModel::class)->findByPath($source);
         }
+
         if ($file && $file->uuid) {
             $source = StringUtil::binToUuid($file->uuid);
         }
@@ -196,17 +208,21 @@ class InserttagListener
 
         $downloadData = $this->framework->createInstance(ContentModel::class);
         $downloadData->id = $id;
+        $downloadData->tstamp = time();
         $downloadData->type = 'download';
         $downloadData->customTpl = 'ce_download_inserttag';
         $downloadData->singleSRC = $source;
+
         if (isset($tag[2]) && \is_string($tag[2])) {
             $downloadData->linkTitle = $tag[2];
         }
         $cssClass = 'inserttag_download';
         $cssId = '';
+
         if (isset($tag[3]) && \is_string($tag[3])) {
             $cssClass .= ' '.strip_tags($tag[3]);
         }
+
         if (isset($tag[4]) && \is_string($tag[4])) {
             $cssId = strip_tags($tag[4]);
         }
