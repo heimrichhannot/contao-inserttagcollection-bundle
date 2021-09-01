@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2021-09-01
+
+- Added: support for php8
+
 ## [1.1.3] - 2021-06-08
 
 - added tstamp for download inserttag for contao 4.9
