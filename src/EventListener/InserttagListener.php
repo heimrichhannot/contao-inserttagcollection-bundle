@@ -98,12 +98,13 @@ class InserttagListener
         }
 
         $email = StringUtil::encodeEmail('mailto:' . $emailLabel);
+        $emailLabel = StringUtil::encodeEmail($emailLabel);
 
-        $label = ($tag[2] ?? null) ?: \preg_replace('/\?.*$/', '', $emailLabel);
-        $classes = ($tag[3] ?? null) ? " class=\"$tag[3]\" " : '';
-        $id = ($tag[4] ?? null) ? " id=\"$tag[4]\" " : '';
+        $label = ($tag[2] ?? null) ?: $emailLabel;
+        $classes = ($tag[3] ?? null) ? " class=\"$tag[3]\"" : '';
+        $id = ($tag[4] ?? null) ? " id=\"$tag[4]\"" : '';
 
-        return \sprintf('<a%s%shref="%s">%s</a>', $id, $classes, $email, $label);
+        return \sprintf('<a%s %s href="%s">%s</a>', $id, $classes, $email, $label);
     }
 
     public function generateDownload(array $tag): string
