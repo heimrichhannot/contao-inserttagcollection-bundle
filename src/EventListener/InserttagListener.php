@@ -1,8 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
- *
+ * @copyright Heimrich & Hannot GmbH (c) 2025
  * @license LGPL-3.0-or-later
  */
 
@@ -10,136 +9,112 @@ namespace HeimrichHannot\ContaoInserttagCollectionBundle\EventListener;
 
 use Contao\ContentDownload;
 use Contao\ContentModel;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\CoreBundle\Routing\UrlGenerator;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\FilesModel;
+use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Validator;
 use HeimrichHannot\ContaoInserttagCollectionBundle\Generator\HtmlElementGenerator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use HeimrichHannot\UtilsBundle\Util\Utils;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[AsHook('replaceInsertTags')]
 class InserttagListener
 {
-    /**
-     * @var array
-     */
-    protected $contentElementUniqueIdCache = [];
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
+    protected array $ceUniqueIdCache = [];
 
-    public function __construct(ContainerInterface $container, ContaoFrameworkInterface $framework)
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly Utils $utils,
+    ) {}
+
+    public function __invoke(string $tag): bool|string
     {
-        $this->container = $container;
-        $this->framework = $framework;
-    }
+        $tag = \trim($tag, '{}');
+        $tag = \explode('::', $tag);
 
-    /**
-     * @return bool|string
-     */
-    public function onReplaceInsertTags(string $tag)
-    {
-        $tag = trim($tag, '{}');
-        $tag = explode('::', $tag);
-
-        if (empty($tag)) {
+        if (!$tagName = $tag[0] ?? null) {
             return false;
         }
 
-        switch ($tag[0]) {
-            case 'link_url_abs':
-                return $this->generateLinkAbsoluteUrl($tag);
-
-            case 'email_label':
-                return $this->generateEmailLabel($tag);
-
-            case 'download':
-                return $this->generateDownload($tag);
-
-            case 'download_link':
-                return $this->generateDownloadLink($tag);
-
-            case 'download_size':
-                return $this->generateDownloadSize($tag);
-
-            case 'small':
-                return $this->generateSmallStartTag($tag);
-
-            case 'endsmall':
-                return $this->generateSmallEndTag($tag);
-
-            case 'strtotime':
-                return $this->generateStrToTime($tag);
-
-            case 'span':
-                return $this->generateHtmlTag('span', $tag);
-
-            case 'endspan':
-                return $this->generateHtmlEndTag('span', $tag);
-        }
-
-        return false;
+        return match ($tagName)
+        {
+            'link_url_abs' => $this->generateLinkAbsoluteUrl($tag),
+            'email_label' => $this->generateEmailLabel($tag),
+            'download' => $this->generateDownload($tag),
+            'download_link' => $this->generateDownloadLink($tag),
+            'download_size' => $this->generateDownloadSize($tag),
+            'small' => $this->generateSmallStartTag($tag),
+            'endsmall' => $this->generateSmallEndTag($tag),
+            'strtotime' => $this->generateStrToTime($tag),
+            'span' => $this->generateHtmlTag('span', $tag),
+            'endspan' => $this->generateHtmlEndTag('span', $tag),
+            default => false,
+        };
     }
 
-    public function generateHtmlTag($htmlTag, $insertTag)
+    public function generateHtmlTag($htmlTag, $insertTag): false|string
     {
-        return HtmlElementGenerator::generateStartTag($htmlTag, isset($insertTag[1]) ? $insertTag[1] : null);
+        return HtmlElementGenerator::generateStartTag($htmlTag, $insertTag[1] ?? null);
     }
 
-    public function generateHtmlEndTag($htmlTag, $insertTag)
+    /** @noinspection PhpUnusedParameterInspection */
+    public function generateHtmlEndTag($htmlTag, $insertTag): false|string
     {
         return HtmlElementGenerator::generateEndTag($htmlTag);
     }
 
-    public function generateLinkAbsoluteUrl(array $tag)
+    public function generateLinkAbsoluteUrl(array $tag): string
     {
-        if (isset($tag[1])) {
-            $pageModel = $this->container->get('huh.utils.url')->getJumpToPageObject($tag[1]);
-
-            if ($pageModel) {
-                $url = $this->container->get('contao.routing.url_generator')->generate($pageModel->alias, [], UrlGenerator::ABSOLUTE_URL);
-
-                return $url;
-            }
+        if (!$jumpTo = (int) ($tag[1] ?? 0)) {
+            return '';
         }
 
-        return '';
+        global $objPage;
+
+        $pageModel = $jumpTo === $objPage->id
+            ? $objPage
+            : $this->utils->model()->findModelInstanceByPk('tl_page', $jumpTo);
+
+        if (!$pageModel instanceof PageModel) {
+            return '';
+        }
+
+        return $this->urlGenerator->generate($pageModel->alias, [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**
-     * @return string mailto-Link or empty string, if no valid mail adress given
+     * @return string mailto-Link or empty string, if no valid mail address given
      */
-    public function generateEmailLabel(array $tag)
+    public function generateEmailLabel(array $tag): string
     {
-        if (!isset($tag[1]) || !Validator::isEmail($tag[1])) {
+        $emailLabel = $tag[1] ?? null;
+
+        if (!$emailLabel || !Validator::isEmail($emailLabel)) {
             return '';
         }
-        $emailLabel = $tag[1];
-        $email = $this->framework->getAdapter(StringUtil::class)->encodeEmail('mailto:'.$tag[1]);
-        // label parameters
-        $label = (isset($tag[2]) && !empty($tag[2])) ? $tag[2] : preg_replace('/\?.*$/', '', $emailLabel);
-        $classes = (isset($tag[3]) && !empty($tag[3])) ? ' class="'.$tag[3].'"' : '';
-        $id = (isset($tag[4]) && !empty($tag[4])) ? 'id="'.$tag[4].'" ' : '';
 
-        $link = sprintf('<a %shref="%s"%s>%s</a>', $id, $email, $classes, $label);
+        $email = StringUtil::encodeEmail('mailto:' . $emailLabel);
+        $emailLabel = StringUtil::encodeEmail($emailLabel);
 
-        return $link;
+        $label = ($tag[2] ?? null) ?: $emailLabel;
+        $classes = ($tag[3] ?? null) ? " class=\"$tag[3]\"" : '';
+        $id = ($tag[4] ?? null) ? " id=\"$tag[4]\"" : '';
+
+        return \sprintf('<a%s %s href="%s">%s</a>', $id, $classes, $email, $label);
     }
 
-    public function generateDownload(array $tag)
+    public function generateDownload(array $tag): string
     {
         $download = $this->doGenerateDownload($tag);
 
         return $download->generate();
     }
 
-    public function generateDownloadLink(array $tag)
+    public function generateDownloadLink(array $tag): string
     {
         $download = $this->doGenerateDownload($tag);
         $download->generate();
@@ -155,17 +130,17 @@ class InserttagListener
         return $download->Template->filesize;
     }
 
-    public function generateSmallStartTag($tag)
+    public function generateSmallStartTag($tag): string
     {
         return '<small>';
     }
 
-    public function generateSmallEndTag($tag)
+    public function generateSmallEndTag($tag): string
     {
         return '</small>';
     }
 
-    public function generateStrToTime($tag)
+    public function generateStrToTime($tag): false|int|string
     {
         $result = strtotime($tag[1], $tag[2] ?? time());
 
@@ -176,20 +151,22 @@ class InserttagListener
         return $result;
     }
 
-    private function doGenerateDownload(array $tag)
+    private function doGenerateDownload(array $tag): ContentDownload
     {
-        $source = strip_tags($tag[1]); // remove <span> etc, otherwise Validator::isuuid fail
+        $source = \strip_tags($tag[1]); // remove <span> etc, otherwise Validator::isUuid fail
 
+        /** @var ?FilesModel $file */
         $file = null;
 
-        if (Validator::isUuid($source)) {
-            /** @var FilesModel $file */
+        if (Validator::isUuid($source))
+        {
             $file = $this->framework->getAdapter(FilesModel::class)->findByUuid($source);
-        } elseif (false !== ($pos = strpos($source, '/'))) {
+        }
+        elseif (false !== ($pos = strpos($source, '/')))
+        {
             if (0 === $pos) {
                 $source = ltrim($source, '/');
             }
-            /** @var FilesModel $file */
             $file = $this->framework->getAdapter(FilesModel::class)->findByPath($source);
         }
 
@@ -197,37 +174,47 @@ class InserttagListener
             $source = StringUtil::binToUuid($file->uuid);
         }
 
-        $db = Database::getInstance();
-        $id = $db->getNextId('tl_content');
-        ++$id;
+        $id = $this->getNextUniqueId();
 
-        while (!$db->isUniqueValue('tl_content', 'id', $id) || \in_array($id, $this->contentElementUniqueIdCache)) {
-            ++$id;
-        }
-        $this->contentElementUniqueIdCache[] = $id;
+        $dlContentModel = $this->framework->createInstance(ContentModel::class);
+        $dlContentModel->id = $id;
+        $dlContentModel->tstamp = time();
+        $dlContentModel->type = 'download';
+        $dlContentModel->customTpl = 'ce_download_inserttag';
+        $dlContentModel->singleSRC = $source;
 
-        $downloadData = $this->framework->createInstance(ContentModel::class);
-        $downloadData->id = $id;
-        $downloadData->tstamp = time();
-        $downloadData->type = 'download';
-        $downloadData->customTpl = 'ce_download_inserttag';
-        $downloadData->singleSRC = $source;
-
-        if (isset($tag[2]) && \is_string($tag[2])) {
-            $downloadData->linkTitle = $tag[2];
+        if (\is_string($tag[2] ?? null)) {
+            $dlContentModel->linkTitle = $tag[2];
         }
         $cssClass = 'inserttag_download';
         $cssId = '';
 
-        if (isset($tag[3]) && \is_string($tag[3])) {
-            $cssClass .= ' '.strip_tags($tag[3]);
+        if (\is_string($tag[3] ?? null)) {
+            $cssClass .= ' ' . \strip_tags($tag[3]);
         }
 
-        if (isset($tag[4]) && \is_string($tag[4])) {
-            $cssId = strip_tags($tag[4]);
+        if (\is_string($tag[4] ?? null)) {
+            $cssId = \strip_tags($tag[4]);
         }
-        $downloadData->cssID = [$cssId, $cssClass];
+        $dlContentModel->cssID = [$cssId, $cssClass];
 
-        return $this->framework->createInstance(ContentDownload::class, [$downloadData]);
+        return $this->framework->createInstance(ContentDownload::class, [$dlContentModel]);
+    }
+
+    public function getNextUniqueId(): int
+    {
+        /** @var Database $db */
+        $db = $this->framework->createInstance(Database::class);
+        $id = $db->getNextId('tl_content');
+
+        do
+        {
+            $id++;
+        }
+        while (\in_array($id, $this->ceUniqueIdCache) || !$db->isUniqueValue('tl_content', 'id', $id));
+
+        $this->ceUniqueIdCache[] = $id;
+
+        return $id;
     }
 }
