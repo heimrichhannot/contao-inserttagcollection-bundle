@@ -13,18 +13,15 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Config\ConfigPluginInterface;
-use Contao\ManagerPlugin\Config\ContainerBuilder;
-use Contao\ManagerPlugin\Config\ExtensionPluginInterface;
 use HeimrichHannot\ContaoInserttagCollectionBundle\HeimrichHannotContaoInserttagCollectionBundle;
-use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
-class Plugin implements BundlePluginInterface, ConfigPluginInterface, ExtensionPluginInterface
+class Plugin implements BundlePluginInterface, ConfigPluginInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getBundles(ParserInterface $parser)
+    public function getBundles(ParserInterface $parser): array
     {
         return [
             BundleConfig::create(HeimrichHannotContaoInserttagCollectionBundle::class)
@@ -35,20 +32,8 @@ class Plugin implements BundlePluginInterface, ConfigPluginInterface, ExtensionP
     /**
      * Allows a plugin to load container configuration.
      */
-    public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig)
+    public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig): void
     {
-        $loader->load('@HeimrichHannotContaoInserttagCollectionBundle/Resources/config/services.yml');
-    }
-
-    /**
-     * Allows a plugin to override extension configuration.
-     *
-     * @param string $extensionName
-     *
-     * @return array<string,mixed>
-     */
-    public function getExtensionConfig($extensionName, array $extensionConfigs, ContainerBuilder $container)
-    {
-        return ContainerUtil::mergeConfigFile('huh_amp', $extensionName, $extensionConfigs, __DIR__.'/../Resources/config/config_amp.yml');
+        $loader->load('@HeimrichHannotContaoInserttagCollectionBundle/config/services.yml');
     }
 }

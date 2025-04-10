@@ -11,7 +11,6 @@ namespace HeimrichHannot\ContaoInserttagCollectionBundle\Test\Plugin;
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\DelegatingParser;
-use Contao\ManagerPlugin\Config\ContainerBuilder;
 use Contao\TestCase\ContaoTestCase;
 use HeimrichHannot\ContaoInserttagCollectionBundle\ContaoManager\Plugin;
 use HeimrichHannot\ContaoInserttagCollectionBundle\HeimrichHannotContaoInserttagCollectionBundle;
@@ -43,14 +42,5 @@ class PluginTest extends ContaoTestCase
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())->method('load');
         $plugin->registerContainerConfiguration($loader, []);
-    }
-
-    public function testGetExtensionConfig()
-    {
-        $plugin = new Plugin();
-        $container = $this->createMock(ContainerBuilder::class);
-        $this->assertEmpty($plugin->getExtensionConfig('test', [], $container));
-
-        $this->assertArrayHasKey('huh_amp', $plugin->getExtensionConfig('huh_amp', [], $container));
     }
 }
